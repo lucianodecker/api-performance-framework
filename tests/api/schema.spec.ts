@@ -3,7 +3,7 @@ import { bookingSchema } from '../../src/schemas/booking.schema';
 import { test, expect } from '@playwright/test';
 
 test.describe('API Response Schema', () => {
-    test('should provide a valid schema', async ({ request }) => {
+    test('GET /booking/:id response should match booking schema', async ({ request }) => {
         const bookingData = {
             firstname: "Erika",
             lastname: "Mustermann",
@@ -22,6 +22,8 @@ test.describe('API Response Schema', () => {
         const ajv = new Ajv();
         const validate = ajv.compile(bookingSchema);
         const valid = validate(bodyGet);
+        
+        if (!valid) console.log(validate.errors);
         expect(valid).toBe(true);
     });
 })
