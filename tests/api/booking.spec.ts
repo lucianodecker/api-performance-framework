@@ -38,7 +38,6 @@ test.describe('Booking - CRUD - /booking', () => {
         const bodyCreate = await create.json();
         const get = await request.get(`/booking/${bodyCreate.bookingid}`);
         const bodyGet = await get.json();
-
         expect(get.status()).toBe(200);
         expect(bodyGet.firstname).toEqual(bookingData.firstname);
         expect(bodyGet.lastname).toEqual(bookingData.lastname);
@@ -60,7 +59,6 @@ test.describe('Booking - CRUD - /booking', () => {
             },
             additionalneeds: "Dinner"
         };
-
         const putData = {
             firstname: "Max",
             lastname: "Mustermann",
@@ -72,7 +70,6 @@ test.describe('Booking - CRUD - /booking', () => {
             },
             additionalneeds: "Breakfast"
         };
-
         const create = await request.post('/booking', { data: bookingData });
         const bodyCreate = await create.json();
         const auth = await request.post('/auth', { data: { username: process.env.API_USERNAME, password: process.env.API_PASSWORD } });
@@ -82,7 +79,6 @@ test.describe('Booking - CRUD - /booking', () => {
             data: putData, 
         });
         const bodyPut = await put.json();
-
         expect(put.status()).toBe(200);
         expect(bodyPut.firstname).toEqual(putData.firstname);
         expect(bodyPut.lastname).toEqual(putData.lastname);
@@ -104,7 +100,6 @@ test.describe('Booking - CRUD - /booking', () => {
             },
             additionalneeds: "Dinner"
         };
-
         const create = await request.post('/booking', { data: bookingData });
         const bodyCreate = await create.json();
         const auth = await request.post('/auth', { data: { username: process.env.API_USERNAME, password: process.env.API_PASSWORD } });
@@ -114,7 +109,6 @@ test.describe('Booking - CRUD - /booking', () => {
             data: {firstname: 'Claudia'}, 
         });
         const bodyPatch = await patch.json();
-
         expect(patch.status()).toBe(200);
         expect(bodyPatch.firstname).toEqual('Claudia');
         expect(bodyPatch.lastname).toEqual(bookingData.lastname);
@@ -124,7 +118,7 @@ test.describe('Booking - CRUD - /booking', () => {
         expect(bodyPatch.additionalneeds).toEqual(bookingData.additionalneeds);
     });
 
-    test('should delete a booking', async ({ request }) => {
+    test('should delete (DELETE) a booking', async ({ request }) => {
         const bookingData = {
             firstname: "Erika",
             lastname: "Mustermann",
@@ -145,7 +139,6 @@ test.describe('Booking - CRUD - /booking', () => {
             headers: { Cookie: `token=${bodyAuth.token}` },
         });
         const get = await request.get(`/booking/${bodyCreate.bookingid}`);
-
         expect(deleteBooking.status()).toBe(201);
         expect(get.status()).toBe(404);
     });
