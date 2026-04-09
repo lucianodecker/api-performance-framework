@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { logApiCall } from '../../src/helpers/api-logger';
 
 test.describe('Booking - CRUD - /booking', () => {
     test('should create (POST) a booking', async ({ request }) => {
@@ -13,8 +14,7 @@ test.describe('Booking - CRUD - /booking', () => {
             },
             additionalneeds: "Breakfast"
         };
-        const create = await request.post('/booking', { data: bookingData });
-        const body = await create.json();
+        const { response: create, body } = await logApiCall(request, 'post', '/booking', { data: bookingData });
         expect(create.status()).toBe(200);
         expect(body.bookingid).toBeDefined();
         expect(typeof body.bookingid).toBe('number');
@@ -34,10 +34,9 @@ test.describe('Booking - CRUD - /booking', () => {
             },
             additionalneeds: "Lunch"
         };
-        const create = await request.post('/booking', { data: bookingData });
-        const bodyCreate = await create.json();
-        const get = await request.get(`/booking/${bodyCreate.bookingid}`);
-        const bodyGet = await get.json();
+
+        const { body: bodyCreate } = await logApiCall(request, 'post', '/booking', { data: bookingData });
+        const { response: get, body: bodyGet } = await logApiCall(request, 'get', `/booking/${bodyCreate.bookingid}`);
         expect(get.status()).toBe(200);
         expect(bodyGet.firstname).toEqual(bookingData.firstname);
         expect(bodyGet.lastname).toEqual(bookingData.lastname);
@@ -70,15 +69,12 @@ test.describe('Booking - CRUD - /booking', () => {
             },
             additionalneeds: "Breakfast"
         };
-        const create = await request.post('/booking', { data: bookingData });
-        const bodyCreate = await create.json();
-        const auth = await request.post('/auth', { data: { username: process.env.API_USERNAME, password: process.env.API_PASSWORD } });
-        const bodyAuth = await auth.json();
-        const put = await request.put(`/booking/${bodyCreate.bookingid}`, { 
+        const { body: bodyCreate } = await logApiCall(request, 'post', '/booking', { data: bookingData });
+        const { body: bodyAuth } = await logApiCall(request, 'post', '/auth', { data: { username: process.env.API_USERNAME, password: process.env.API_PASSWORD } });
+        const { response: put, body: bodyPut } = await logApiCall(request, 'put', `/booking/${bodyCreate.bookingid}`, {
             headers: { Cookie: `token=${bodyAuth.token}` },
-            data: putData, 
+            data: putData,
         });
-        const bodyPut = await put.json();
         expect(put.status()).toBe(200);
         expect(bodyPut.firstname).toEqual(putData.firstname);
         expect(bodyPut.lastname).toEqual(putData.lastname);
@@ -100,15 +96,12 @@ test.describe('Booking - CRUD - /booking', () => {
             },
             additionalneeds: "Dinner"
         };
-        const create = await request.post('/booking', { data: bookingData });
-        const bodyCreate = await create.json();
-        const auth = await request.post('/auth', { data: { username: process.env.API_USERNAME, password: process.env.API_PASSWORD } });
-        const bodyAuth = await auth.json();
-        const patch = await request.patch(`/booking/${bodyCreate.bookingid}`, { 
+        const { body: bodyCreate } = await logApiCall(request, 'post', '/booking', { data: bookingData });
+        const { body: bodyAuth } = await logApiCall(request, 'post', '/auth', { data: { username: process.env.API_USERNAME, password: process.env.API_PASSWORD } });
+        const { response: patch, body: bodyPatch } = await logApiCall(request, 'patch', `/booking/${bodyCreate.bookingid}`, {
             headers: { Cookie: `token=${bodyAuth.token}` },
-            data: {firstname: 'Claudia'}, 
+            data: { firstname: 'Claudia' },
         });
-        const bodyPatch = await patch.json();
         expect(patch.status()).toBe(200);
         expect(bodyPatch.firstname).toEqual('Claudia');
         expect(bodyPatch.lastname).toEqual(bookingData.lastname);
@@ -131,14 +124,12 @@ test.describe('Booking - CRUD - /booking', () => {
             additionalneeds: "Breakfast"
         };
 
-        const create = await request.post('/booking', { data: bookingData });
-        const bodyCreate = await create.json();
-        const auth = await request.post('/auth', { data: { username: process.env.API_USERNAME, password: process.env.API_PASSWORD } });
-        const bodyAuth = await auth.json();
-        const deleteBooking = await request.delete(`/booking/${bodyCreate.bookingid}`, { 
+        const { body: bodyCreate } = await logApiCall(request, 'post', '/booking', { data: bookingData });
+        const { body: bodyAuth } = await logApiCall(request, 'post', '/auth', { data: { username: process.env.API_USERNAME, password: process.env.API_PASSWORD } });
+        const { response: deleteBooking } = await logApiCall(request, 'delete', `/booking/${bodyCreate.bookingid}`, {
             headers: { Cookie: `token=${bodyAuth.token}` },
         });
-        const get = await request.get(`/booking/${bodyCreate.bookingid}`);
+        const { response: get } = await logApiCall(request, 'get', `/booking/${bodyCreate.bookingid}`);
         expect(deleteBooking.status()).toBe(201);
         expect(get.status()).toBe(404);
     });

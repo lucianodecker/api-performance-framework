@@ -1,13 +1,14 @@
 import { test, expect } from '@playwright/test';
+import { logApiCall } from '../../src/helpers/api-logger';
 
 test.describe('Negative Tests - /booking', () => {
     test('invalid bookingid - (GET) should get a 404 response', async ({ request }) => {
-        const get = await request.get(`/booking/99999`);
+        const { response: get } = await logApiCall(request, 'get', `/booking/99999`);
         expect(get.status()).toBe(404);
     });
 
     test('string instead of number for bookingid - (GET) should get a 404 response', async ({ request }) => {
-        const get = await request.get(`/booking/abcxyz`);
+        const { response: get } = await logApiCall(request, 'get', `/booking/abcxyz`);
         expect(get.status()).toBe(404);
     });
 
@@ -34,10 +35,9 @@ test.describe('Negative Tests - /booking', () => {
             },
             additionalneeds: "Breakfast"
         };
-        const create = await request.post('/booking', { data: bookingData });
-        const bodyCreate = await create.json();
-        const put = await request.put(`/booking/${bodyCreate.bookingid}`, {
-            data: putData, 
+        const { body: bodyCreate } = await logApiCall(request, 'post', '/booking', { data: bookingData });
+        const { response: put } = await logApiCall(request, 'put', `/booking/${bodyCreate.bookingid}`, {
+            data: putData,
         });
         expect(put.status()).toBe(403);
     });
@@ -54,15 +54,14 @@ test.describe('Negative Tests - /booking', () => {
             },
             additionalneeds: "Breakfast"
         };
-        const create = await request.post('/booking', { data: bookingData });
-        const bodyCreate = await create.json();
-        const deleteBooking = await request.delete(`/booking/${bodyCreate.bookingid}`);
+        const { body: bodyCreate } = await logApiCall(request, 'post', '/booking', { data: bookingData });
+        const { response: deleteBooking } = await logApiCall(request, 'delete', `/booking/${bodyCreate.bookingid}`);
         expect(deleteBooking.status()).toBe(403);
     });
 
     test('Empty Body - (POST) should get a 500 response', async ({ request }) => {
         // API returns 500 instead of 400 for invalid request body (design flaw)
-        const create = await request.post('/booking', {});
+        const { response: create } = await logApiCall(request, 'post', '/booking', {});
         expect(create.status()).toBe(500);
     });
 
@@ -71,7 +70,7 @@ test.describe('Negative Tests - /booking', () => {
         const bookingData = {
             firstname: "Erika"
         };
-        const create = await request.post('/booking', { data: bookingData });
+        const { response: create } = await logApiCall(request, 'post', '/booking', { data: bookingData });
         expect(create.status()).toBe(500);
     });
 })
