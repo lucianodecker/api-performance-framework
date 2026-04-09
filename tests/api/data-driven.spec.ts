@@ -228,7 +228,7 @@ test.describe('Data Driven Tests', () => {
         // SECURITY FINDING: API stores all payloads without sanitization or escaping
         // Risk: Stored XSS if data is rendered in any UI (e.g. admin dashboard)
         // Expected behavior: API should reject or sanitize HTML/script content
-        // Severity: High (OWASP A7:2017 - Cross-Site Scripting)
+        // Severity: High (OWASP A03:2021 - Injection)
 
         const securityCases = [
             // Additional XSS vectors
